@@ -16,71 +16,159 @@ class(Dati)
 # Costruisco la scala di deflusso con il primo set di dati (mis1)
 # 1 - ripetere la costruzione per gli altri set
 # 2 - confrontare le scale di deflusso ottenute e le corrispondenti stime di Q(h=2m))
-# h.mis<-Dati$h.mis1
-# Q.mis<-Dati$Q.mis1
+h.mis1<-Dati$h.mis1
+Q.mis1<-Dati$Q.mis1
 # Esempio con il secondo set di dati (mis2)
-h.mis<-Dati$h.mis2
-Q.mis<-Dati$Q.mis2
+# h.mis<-Dati$h.mis1
+# Q.mis<-Dati$Q.mis2
 
 # Scala di deflusso: regressione lineare tra le trasformate logaritmiche
 # Uso la funzione di R "lm"
-log(Q.mis) #trasformata logaritmica delle portate misurate
-log(h.mis) #trasformata logaritmica delle h misurate
-plot(log(Q.mis),log(h.mis))
+#log(Q.mis) #trasformata logaritmica delle portate misurate
+#log(h.mis) #trasformata logaritmica delle h misurate
+#plot(log(Q.mis),log(h.mis))
 #lm(y~x) sintassi della funzione di regressione lineare
-lm(formula=log(Q.mis)~log(h.mis)) #na.eclude toglie gli NA
-exp(4.131)
+#lm(formula=log(Q.mis1)~log(h.mis1)) #na.eclude toglie gli NA
+#exp(4.131)
 
-Sc.Def<-lm(formula=log(Q.mis)~log(h.mis),na.action=na.exclude) #regressione ai minimi quadrati
-Sc.Def$coefficients[2] #così estraggo ad esempio il valore di b, secondo elemento di coefficients
+Sc.Def1<-lm(formula=log(Q.mis1)~log(h.mis1),na.action=na.exclude) #regressione ai minimi quadrati
+Sc.Def1$coefficients[2] #così estraggo ad esempio il valore di b, secondo elemento di coefficients
 
-summary(Sc.Def) # coefficienti e statistiche di interesse
+summary(Sc.Def1) # coefficienti e statistiche di interesse
 # Intervallo di confidenza della scala di deflusso
 # Traccio le fasce per tiranti arbitrari da 0.1m a 2m con passo 0.1m
 # la funzione "predict" richiede in ingresso una variabile "data.frame"
-seq(from=0.1, to = 2, by = 0.1) #sequenze regolari in R
+#seq(from=0.1, to = 2, by = 0.1) #sequenze regolari in R
 
 
 
-Tiranti<-data.frame(h.mis=seq(0.1,2,.1)) #genero una sequenza di "tiranti"
+Tiranti1<-data.frame(h.mis1=seq(0.1,2,.1)) #genero una sequenza di "tiranti"
 #predict(Sc.Def,Tiranti,interval="confidence")  sorgente, 
 #exp(predict(Sc.Def,Tiranti,interval="confidence")) trasformo da ln a normali, cioè esponenziale
 #signif(exp(predict(Sc.Def,Tiranti,interval="confidence")),digits = 4) arrotonda a 4 cifre significative
-Confidenza<-signif(exp(predict(Sc.Def,Tiranti,interval="confidence")),digits = 4)
+Confidenza1<-signif(exp(predict(Sc.Def1,Tiranti1,interval="confidence")),digits = 4)
 
 # Salvo la scala di deflusso e fasce di confidenza in un file txt
 # per utilizzi successivi (ad es. importazione in excel)
-Sc.Def.mis1<-Tiranti #è un dataset e lo assegno ad una nuova variabile
-Sc.Def.mis1[,2:4]<-Confidenza #nello stesso dataset nelle colonne 2,3,4 metto il dataset confidenza 
+Sc.Def.mis1<-Tiranti1 #è un dataset e lo assegno ad una nuova variabile
+Sc.Def.mis1[,2:4]<-Confidenza1 #nello stesso dataset nelle colonne 2,3,4 metto il dataset confidenza 
 colnames(Sc.Def.mis1)<-c("h (m)","Q(m^3/s)","Int.Conf-","Int.Conf+") #rinomino le colonne
 write.table(Sc.Def.mis1,file = "ScalaDef_mis1.txt",sep = ";",dec = ".",row.names = F) #row.names=false, rimuovo il nome delle righe ma mantengo quelli delle colonne
 # ATTENZIONE AL NOME DEL FILE, RIFERIMENTO ESPLICITO A "mis1" 
 
 # Rappresento i risultati (scala naturale)
-plot(Q.mis,h.mis)
-plot(Q.mis,h.mis,
+#plot(Q.mis1,h.mis1)
+par(mfrow=c(2,2))
+plot(Q.mis1,h.mis1,
      xlim=c(0.1,240),ylim=c(0.01,2),
      xlab=expression(paste("Portata (",m^3/s,")",sep="")),
      ylab="Tirante (m)",
-     main="Misure di portata e scala di deflusso",
+     main="Misure di portata e scala di deflusso - I set",
      type="p",col="red") 
-lines(Confidenza[,1],Tiranti[,],col="blue",lwd=2)
-lines(Confidenza[,2],Tiranti[,],col="red",lty = "dashed")
-lines(Confidenza[,3],Tiranti[,],col="red",lty = "dashed")
+lines(Confidenza1[,1],Tiranti1[,],col="blue",lwd=2)
+lines(Confidenza1[,2],Tiranti1[,],col="red",lty = "dashed")
+lines(Confidenza1[,3],Tiranti1[,],col="red",lty = "dashed")
 
 # Da cui la portata corrispondente ad un tirante di 2m risulta
-Q.2m<-signif(Confidenza[which(Tiranti$h.mis==2),],digits = 4)
-Q.2m # valori di portata
-Q.2m/Q.2m[1] # rapporto tra stima e estremi dell'intervallo di confidenza
+Q.2m1<-signif(Confidenza1[which(Tiranti1$h.mis==2),],digits = 4)
+Q.2m1 # valori di portata
+Q.2m1/Q.2m1[1] # rapporto tra stima e estremi dell'intervallo di confidenza
 
 # Rappresento i risultati (scala logaritmica) e quindi faccio una rappresentazione lineare
-plot(Q.mis,h.mis,log="xy", 
-     xlim=c(0.005,240),ylim=c(0.001,2),
+#plot(Q.mis1,h.mis1,log="xy", 
+    # xlim=c(0.005,240),ylim=c(0.001,2),
+    # xlab=expression(paste("Portata (",m^3/s,")",sep="")),
+    # ylab="Tirante (m)",
+    # main="Misure di portata e scala di deflusso",
+    # type="p",col="red") #l'unica cosa diversa è il log="xy" e cioè chiedo di fare in scala logaritmica sia l'asse x che y
+#non mettere mai zero come origine del grafico perchè altrimenti non si riesce a fare in scala logaritmica
+#lines(Confidenza1[,1],Tiranti1[,],col="blue",lwd=2)
+#lines(Confidenza1[,2],Tiranti1[,],col="red",lty = "dashed")
+#lines(Confidenza1[,3],Tiranti1[,],col="red",lty = "dashed")
+
+# SECONDO SET DI DATI
+h.mis2<-Dati$h.mis2
+Q.mis2<-Dati$Q.mis2
+Sc.Def2<-lm(formula=log(Q.mis2)~log(h.mis2),na.action=na.exclude) 
+Sc.Def2$coefficients[2] 
+summary(Sc.Def2)
+Tiranti2<-data.frame(h.mis2=seq(0.1,2,.1))
+Confidenza2<-signif(exp(predict(Sc.Def2,Tiranti2,interval="confidence")),digits = 4)
+Sc.Def.mis2<-Tiranti2 
+Sc.Def.mis2[,2:4]<-Confidenza2  
+colnames(Sc.Def.mis2)<-c("h (m)","Q(m^3/s)","Int.Conf-","Int.Conf+") 
+write.table(Sc.Def.mis2,file = "ScalaDef_mis2.txt",sep = ";",dec = ".",row.names = F)
+plot(Q.mis2,h.mis2,
+     xlim=c(0.1,240),ylim=c(0.01,2),
      xlab=expression(paste("Portata (",m^3/s,")",sep="")),
      ylab="Tirante (m)",
-     main="Misure di portata e scala di deflusso",
-     type="p",col="red") #l'unica cosa diversa è il log="xy" e cioè chiedo di fare in scala logaritmica sia l'asse x che y
-#non mettere mai zero come origine del grafico perchè altrimenti non si riesce a fare in scala logaritmica
-lines(Confidenza[,1],Tiranti[,],col="blue",lwd=2)
-lines(Confidenza[,2],Tiranti[,],col="red",lty = "dashed")
-lines(Confidenza[,3],Tiranti[,],col="red",lty = "dashed")
+     main="Misure di portata e scala di deflusso - II set",
+     type="p",col="red") 
+lines(Confidenza2[,1],Tiranti2[,],col="blue",lwd=2)
+lines(Confidenza2[,2],Tiranti2[,],col="red",lty = "dashed")
+lines(Confidenza2[,3],Tiranti2[,],col="red",lty = "dashed")
+
+Q.2m2<-signif(Confidenza2[which(Tiranti2$h.mis2==2),],digits = 4)
+Q.2m2 
+Q.2m2/Q.2m2[1] 
+
+# TERZO SET DI DATI
+h.mis3<-Dati$h.mis3
+Q.mis3<-Dati$Q.mis3
+Sc.Def3<-lm(formula=log(Q.mis3)~log(h.mis3),na.action=na.exclude) 
+Sc.Def3$coefficients[2] 
+summary(Sc.Def3)
+Tiranti3<-data.frame(h.mis3=seq(0.1,2,.1))
+Confidenza3<-signif(exp(predict(Sc.Def3,Tiranti3,interval="confidence")),digits = 4)
+Sc.Def.mis3<-Tiranti3
+Sc.Def.mis3[,2:4]<-Confidenza3  
+colnames(Sc.Def.mis3)<-c("h (m)","Q(m^3/s)","Int.Conf-","Int.Conf+") 
+write.table(Sc.Def.mis3,file = "ScalaDef_mis3.txt",sep = ";",dec = ".",row.names = F)
+plot(Q.mis3,h.mis3,
+     xlim=c(0.1,240),ylim=c(0.01,2),
+     xlab=expression(paste("Portata (",m^3/s,")",sep="")),
+     ylab="Tirante (m)",
+     main="Misure di portata e scala di deflusso - III set",
+     type="p",col="red") 
+lines(Confidenza3[,1],Tiranti3[,],col="blue",lwd=2)
+lines(Confidenza3[,2],Tiranti3[,],col="red",lty = "dashed")
+lines(Confidenza3[,3],Tiranti3[,],col="red",lty = "dashed")
+
+Q.2m3<-signif(Confidenza3[which(Tiranti3$h.mis3==2),],digits = 4)
+Q.2m3 
+Q.2m3/Q.2m3[1]
+
+# QUARTO SET DI DATI
+h.mis4<-Dati$h.mis4
+Q.mis4<-Dati$Q.mis4
+Sc.Def4<-lm(formula=log(Q.mis4)~log(h.mis4),na.action=na.exclude) 
+Sc.Def4$coefficients[2] 
+summary(Sc.Def4)
+Tiranti4<-data.frame(h.mis4=seq(0.1,2,.1))
+Confidenza4<-signif(exp(predict(Sc.Def4,Tiranti4,interval="confidence")),digits = 4)
+Sc.Def.mis4<-Tiranti4
+Sc.Def.mis4[,2:4]<-Confidenza4  
+colnames(Sc.Def.mis4)<-c("h (m)","Q(m^3/s)","Int.Conf-","Int.Conf+") 
+write.table(Sc.Def.mis4,file = "ScalaDef_mis4.txt",sep = ";",dec = ".",row.names = F)
+plot(Q.mis4,h.mis4,
+     xlim=c(0.1,240),ylim=c(0.01,2),
+     xlab=expression(paste("Portata (",m^3/s,")",sep="")),
+     ylab="Tirante (m)",
+     main="Misure di portata e scala di deflusso - IV set",
+     type="p",col="red") 
+lines(Confidenza4[,1],Tiranti4[,],col="blue",lwd=2)
+lines(Confidenza4[,2],Tiranti4[,],col="red",lty = "dashed")
+lines(Confidenza4[,3],Tiranti4[,],col="red",lty = "dashed")
+
+Q.2m4<-signif(Confidenza4[which(Tiranti4$h.mis4==2),],digits = 4)
+Q.2m4 
+Q.2m4/Q.2m4[1]
+
+q2m<-data.frame(Q.2m1)
+q2m[,2]<-data.frame(Q.2m2)
+q2m[,3]<-data.frame(Q.2m3)
+q2m[,4]<-data.frame(Q.2m4)
+rownames(q2m)<-c("Q a 2m","lwr","upr")
+colnames(q2m)<-c("I campagna","II campagna","III campagna","IV campagna")
+View(q2m)
+write.table(q2m,file = "Portate_2m.txt",sep = ";",dec = ".",row.names = T)
