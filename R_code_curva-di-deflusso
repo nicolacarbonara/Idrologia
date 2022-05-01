@@ -72,7 +72,7 @@ lines(Confidenza1[,3],Tiranti1[,],col="red",lty = "dashed")
 # Da cui la portata corrispondente ad un tirante di 2m risulta
 Q.2m1<-signif(Confidenza1[which(Tiranti1$h.mis==2),],digits = 4)
 Q.2m1 # valori di portata
-Q.2m1/Q.2m1[1] # rapporto tra stima e estremi dell'intervallo di confidenza
+perc1<-Q.2m1/Q.2m1[1] # rapporto tra stima e estremi dell'intervallo di confidenza
 
 # Rappresento i risultati (scala logaritmica) e quindi faccio una rappresentazione lineare
 #plot(Q.mis1,h.mis1,log="xy", 
@@ -110,7 +110,7 @@ lines(Confidenza2[,3],Tiranti2[,],col="red",lty = "dashed")
 
 Q.2m2<-signif(Confidenza2[which(Tiranti2$h.mis2==2),],digits = 4)
 Q.2m2 
-Q.2m2/Q.2m2[1] 
+perc2<-Q.2m2/Q.2m2[1] 
 
 # TERZO SET DI DATI
 h.mis3<-Dati$h.mis3
@@ -136,7 +136,7 @@ lines(Confidenza3[,3],Tiranti3[,],col="red",lty = "dashed")
 
 Q.2m3<-signif(Confidenza3[which(Tiranti3$h.mis3==2),],digits = 4)
 Q.2m3 
-Q.2m3/Q.2m3[1]
+perc3<-Q.2m3/Q.2m3[1]
 
 # QUARTO SET DI DATI
 h.mis4<-Dati$h.mis4
@@ -162,7 +162,7 @@ lines(Confidenza4[,3],Tiranti4[,],col="red",lty = "dashed")
 
 Q.2m4<-signif(Confidenza4[which(Tiranti4$h.mis4==2),],digits = 4)
 Q.2m4 
-Q.2m4/Q.2m4[1]
+perc4<-Q.2m4/Q.2m4[1]
 
 q2m<-data.frame(Q.2m1)
 q2m[,2]<-data.frame(Q.2m2)
@@ -172,3 +172,9 @@ rownames(q2m)<-c("Q a 2m","lwr","upr")
 colnames(q2m)<-c("I campagna","II campagna","III campagna","IV campagna")
 View(q2m)
 write.table(q2m,file = "Portate_2m.txt",sep = ";",dec = ".",row.names = T)
+perc<-data.frame(perc1,perc2,perc3,perc4)
+perc<-t(perc)
+colnames(perc)<-c("~","% lwr","% upr")
+rownames(perc)<-c("campagna I","campagna II","campagna III", "campagna IV")
+write.table(perc,file = "Percentuale_limiti_conf.txt",sep = ";",dec = ".",row.names = T)
+View(perc)
